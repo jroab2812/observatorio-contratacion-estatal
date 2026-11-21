@@ -1,0 +1,33 @@
+services:
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./data:/data
+    networks:
+      - spark-net
+
+  spark:
+    image: jupyter/pyspark-notebook:spark-3.5.0
+    container_name: spark
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+      - "8501:8501"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./scripts:/home/jovyan/scripts
+      - ./data:/home/jovyan/work/data
+      - ./output:/home/jovyan/output
+    networks:
+      - spark-net
+
+networks:
+  spark-net:
+    name: spark-net
+    driver: bridge
